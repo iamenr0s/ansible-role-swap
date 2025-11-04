@@ -1,0 +1,40 @@
+# Role - Main Tasks
+
+- name: Detect active swap entries
+  ansible.builtin.shell: awk 'NR>1{print}' /proc/swaps
+  register: swap_entries
+  changed_when: false
+  failed_when: false
+
+- name: Set swap_active fact
+  ansible.builtin.set_fact:
+    swap_active: "{{ (swap_entries.stdout_lines | length) > 0 }}"
+
+- name: Enable swap (swapon -a)
+  become: true
+  ansible.builtin.command: swapon -a
+  when: swap_enabled | bool and not swap_active
+
+- name: Disable swap (swapoff -a)
+  become: true
+  ansible.builtin.command: swapoff -a
+  when: not swap_enabled | bool and swap_active
+
+- name: Configure vm.swappiness when enabling swap
+  become: true
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: "{{ swap_swappiness }}"
+    state: present
+    sysctl_file: /etc/sysctl.conf
+    reload: true
+  when: swap_enabled | bool and (swap_swappiness is defined) and (swap_swappiness | string) != ''
+
+- name: Remove vm.swappiness when disabling swap
+  become: true
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    state: absent
+    sysctl_file: /etc/sysctl.conf
+    reload: true
+  when: not swap_enabled | bool and (swap_swappiness is defined) and (swap_swappiness | string) != ''

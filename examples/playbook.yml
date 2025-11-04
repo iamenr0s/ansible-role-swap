@@ -1,0 +1,20 @@
+---
+
+# Example Playbook for swap management (runtime)
+
+# Enable swap (swapon -a)
+- hosts: all
+  become: true
+  roles:
+    - role: iamenros.ansible_role_swap
+      vars:
+        swap_enabled: true
+        swap_swappiness: 40
+
+# Disable swap (swapoff -a)
+- hosts: all
+  become: true
+  roles:
+    - role: iamenros.ansible_role_swap
+      vars:
+        swap_enabled: false

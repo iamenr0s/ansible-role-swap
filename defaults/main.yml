@@ -1,0 +1,7 @@
+---
+
+# Whether to enable swap (swapon -a) or disable swap (swapoff -a)
+swap_enabled: true
+
+# Optional: tune kernel swappiness (0–100). Set to null to skip.
+swap_swappiness: 60
