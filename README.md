@@ -67,7 +67,7 @@ common Linux distributions.
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
 
 ## Author Information
 
