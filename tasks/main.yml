@@ -9,6 +9,12 @@
 - name: Set swap_active fact
   ansible.builtin.set_fact:
     swap_active: "{{ (swap_entries.stdout_lines | length) > 0 }}"
+  when: swap_entries is defined
+ 
+ - name: Default swap_active when detection failed
+   ansible.builtin.set_fact:
+    swap_active: false
+  when: swap_entries is not defined
 
 - name: Enable swap (swapon -a)
   ansible.builtin.command: swapon -a
