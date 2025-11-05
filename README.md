@@ -63,7 +63,7 @@ common Linux distributions.
 
 ## Testing
 
-- Molecule scenario uses a privileged container but keeps `swap_enabled: false` by default because enabling swap is typically not allowed in containers. Adjust for real hosts as needed.
+Molecule scenario uses a privileged container but keeps `swap_enabled: false` by default because enabling swap is typically not allowed in containers. Adjust for real hosts as needed.
 
 ## License
 
