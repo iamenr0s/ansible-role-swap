@@ -13,16 +13,16 @@ common Linux distributions.
 
 ## Requirements
 
-- Ansible 2.12 or higher
+- Ansible 2.9 or higher
 - Collections: `ansible.posix`
 
 ## Supported Platforms
 
-- Ubuntu 20.04 (focal), 22.04 (jammy)
+- Ubuntu 20.04 (focal), 22.04 (jammy), 24.04 (kinetic)
 - Debian 11 (bullseye), 12 (bookworm)
-- EL/RHEL 8, 9
-- Rocky Linux 8, 9
-- Fedora 38, 39
+- EL/RHEL 8, 9, 10
+- Rocky Linux 8, 9, 10
+- Fedora 39+
 
 ## Role Variables
 
@@ -86,3 +86,4 @@ Contributions are welcome! Please:
 ## Changelog
 
 See `CHANGELOG.md` for version history and release notes.
+

@@ -1,31 +1,38 @@
 ---
+
 galaxy_info:
   role_name: ansible_role_swap
   author: "iamenr0s"
   description: "Manage Linux swap runtime state: enable (swapon -a) or disable (swapoff -a); optionally tune vm.swappiness."
   license: MIT
-  min_ansible_version: "2.12"
+  min_ansible_version: "2.9"
   platforms:
     - name: "Debian"
       versions:
         - "bullseye"
         - "bookworm"
+        - "trixie"
     - name: "EL"
       versions:
         - "8"
         - "9"
+        - "10"
     - name: "Fedora"
       versions:
-        - "38"
         - "39"
+        - "40"
+        - "41"
+        - "42"
     - name: "Rocky"
       versions:
         - "8.0"
         - "9.0"
+        - "10.0"
     - name: "Ubuntu"
       versions:
         - "focal"
         - "jammy"
+        - "kinetic"
   galaxy_tags:
     - swap
     - memory
