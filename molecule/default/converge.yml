@@ -3,10 +3,11 @@
 - name: Converge
   hosts: all
   gather_facts: true
-  become: true
+  become: false
 
   roles:
     - role: iamenr0s.ansible_role_swap
+      become: true
       vars:
         # Containers typically cannot enable swap; keep disabled for Molecule
         swap_enabled: false
