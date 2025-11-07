@@ -8,7 +8,7 @@
 
 - name: Set swap_active fact
   ansible.builtin.set_fact:
-    swap_active: "{{ (swap_entries.stdout_lines | length) > 0 }}"
+    swap_active: "{{ ((swap_entries.stdout_lines | default([])) | length) > 0 }}"
   when: swap_entries is defined
  
 - name: Default swap_active when detection failed
