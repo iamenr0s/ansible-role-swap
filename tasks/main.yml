@@ -18,11 +18,11 @@
 
 - name: Enable swap (swapon -a)
   ansible.builtin.command: swapon -a
-  when: swap_enabled | bool and not swap_active
+  when: swap_enabled | bool and not swap_active and (ansible_virtualization_type is not defined or ansible_virtualization_type not in ['docker','podman','container'])
 
 - name: Disable swap (swapoff -a)
   ansible.builtin.command: swapoff -a
-  when: not swap_enabled | bool and swap_active
+  when: not swap_enabled | bool and swap_active and (ansible_virtualization_type is not defined or ansible_virtualization_type not in ['docker','podman','container'])
 
 - name: Configure vm.swappiness when enabling swap
   ansible.posix.sysctl:
