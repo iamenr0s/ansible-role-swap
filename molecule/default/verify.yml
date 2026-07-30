@@ -1,0 +1,36 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: true
+  become: false
+
+  tasks:
+    - name: Verify | Check for a vm.swappiness entry in sysctl.conf
+      ansible.builtin.command:
+        cmd: grep -c '^vm.swappiness' /etc/sysctl.conf
+      register: __verify_swappiness_count
+      changed_when: false
+      failed_when: false
+
+    - name: Verify | Assert vm.swappiness was removed since swap_enabled is false
+      ansible.builtin.assert:
+        that:
+          - __verify_swappiness_count.stdout | int == 0
+        fail_msg: >-
+          Expected no vm.swappiness entry in /etc/sysctl.conf since
+          swap_enabled is false in Molecule, found
+          {{ __verify_swappiness_count.stdout }}
+
+    - name: Verify | Detect active swap entries
+      ansible.builtin.command:
+        cmd: awk 'NR>1{print}' /proc/swaps
+      register: __verify_swap_entries
+      changed_when: false
+      failed_when: false
+
+    - name: Verify | Assert the role did not enable swap inside the container
+      ansible.builtin.assert:
+        that:
+          - (__verify_swap_entries.stdout_lines | default([])) | length == 0
+        fail_msg: "Unexpected active swap entries found: {{ __verify_swap_entries.stdout_lines }}"

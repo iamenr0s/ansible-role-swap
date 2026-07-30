@@ -1,0 +1,18 @@
+---
+
+argument_specs:
+  main:
+    short_description: >-
+      Manages Linux swap runtime state: enable (swapon -a) or disable
+      (swapoff -a); optionally tunes vm.swappiness.
+    options:
+      swap_enabled:
+        description: Whether to enable swap (swapon -a) or disable swap (swapoff -a).
+        type: bool
+        default: true
+      swap_swappiness:
+        description: >-
+          Kernel swappiness value (0-100) to set via vm.swappiness. Set to
+          null to skip managing swappiness entirely.
+        type: raw
+        default: 60

@@ -1,28 +1,49 @@
 # Role - Main Tasks
 
 - name: Detect active swap entries
-  ansible.builtin.shell: awk 'NR>1{print}' /proc/swaps
+  ansible.builtin.command:
+    cmd: awk 'NR>1{print}' /proc/swaps
   register: swap_entries
   changed_when: false
   failed_when: false
+  tags:
+    - swap
 
 - name: Set swap_active fact
   ansible.builtin.set_fact:
     swap_active: "{{ ((swap_entries.stdout_lines | default([])) | length) > 0 }}"
   when: swap_entries is defined
- 
+  tags:
+    - swap
+
 - name: Default swap_active when detection failed
   ansible.builtin.set_fact:
     swap_active: false
   when: swap_entries is not defined
+  tags:
+    - swap
 
 - name: Enable swap (swapon -a)
-  ansible.builtin.command: swapon -a
-  when: swap_enabled | bool and not swap_active and (ansible_virtualization_type is defined and ansible_virtualization_type not in ['docker','podman','container'])
+  ansible.builtin.command:
+    cmd: swapon -a
+  changed_when: true
+  when: >-
+    swap_enabled | bool and not swap_active and
+    (ansible_facts['virtualization_type'] is defined and
+    ansible_facts['virtualization_type'] not in ['docker', 'podman', 'container'])
+  tags:
+    - swap
 
 - name: Disable swap (swapoff -a)
-  ansible.builtin.command: swapoff -a
-  when: not swap_enabled | bool and swap_active and (ansible_virtualization_type is defined and ansible_virtualization_type not in ['docker','podman','container'])
+  ansible.builtin.command:
+    cmd: swapoff -a
+  changed_when: true
+  when: >-
+    not swap_enabled | bool and swap_active and
+    (ansible_facts['virtualization_type'] is defined and
+    ansible_facts['virtualization_type'] not in ['docker', 'podman', 'container'])
+  tags:
+    - swap
 
 - name: Configure vm.swappiness when enabling swap
   ansible.posix.sysctl:
@@ -31,7 +52,11 @@
     state: present
     sysctl_file: /etc/sysctl.conf
     reload: true
-  when: swap_enabled | bool and (swap_swappiness is defined) and (swap_swappiness | string) != ''
+  when: >-
+    swap_enabled | bool and (swap_swappiness is defined) and
+    (swap_swappiness | string) != ''
+  tags:
+    - swap
 
 - name: Remove vm.swappiness when disabling swap
   ansible.posix.sysctl:
@@ -39,4 +64,8 @@
     state: absent
     sysctl_file: /etc/sysctl.conf
     reload: true
-  when: not swap_enabled | bool and (swap_swappiness is defined) and (swap_swappiness | string) != ''
+  when: >-
+    not swap_enabled | bool and (swap_swappiness is defined) and
+    (swap_swappiness | string) != ''
+  tags:
+    - swap

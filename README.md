@@ -1,89 +1,89 @@
-# Ansible Role: Swap
-Manage the system swap runtime state across Linux hosts. This role toggles swap on or off
-using the system swapon/swapoff mechanisms and can optionally tune `vm.swappiness`.
-It is designed for simple runtime control (not for creating swapfiles) and works across
-common Linux distributions.
+[![Molecule](https://github.com/iamenr0s/ansible-role-swap/actions/workflows/molecule.yml/badge.svg)](https://github.com/iamenr0s/ansible-role-swap/actions/workflows/molecule.yml) ![Ansible Role](https://img.shields.io/ansible/role/d/iamenr0s/ansible_role_swap) [![CodeFactor](https://www.codefactor.io/repository/github/iamenr0s/ansible-role-swap/badge)](https://www.codefactor.io/repository/github/iamenr0s/ansible-role-swap)
 
-## Features
+Ansible Role: Swap
+===================
 
-- Enable or disable swap cleanly and idempotently (runtime)
-- Leverages `swapon -a` and `swapoff -a` based on desired state
-- Optional tuning of `vm.swappiness` via `sysctl`
-- Safe defaults; suitable for Debian, Ubuntu, RHEL/Alma/Rocky, Fedora
+Manages the system swap runtime state across Linux hosts. This role toggles swap on or off using `swapon`/`swapoff` and can optionally tune `vm.swappiness`. It is designed for simple runtime control (not for creating swapfiles) and skips swap operations automatically inside containers.
 
-## Requirements
+Features
+--------
+- Enables or disables swap cleanly and idempotently (`swapon -a` / `swapoff -a`).
+- Optional tuning of `vm.swappiness` via `ansible.posix.sysctl`.
+- Detects container/virtualization environments and skips swap toggling there, since containers typically cannot enable swap.
 
-- Ansible 2.9 or higher
-- Collections: `ansible.posix`
+Requirements
+------------
+- Ansible 2.9 or higher.
+- Collection: `ansible.posix` (for the `sysctl` module).
 
-## Supported Platforms
-
-- Ubuntu 20.04 (focal), 22.04 (jammy), 24.04 (kinetic)
-- Debian 11 (bullseye), 12 (bookworm)
-- EL/RHEL 8, 9, 10
+Supported Platforms
+--------------------
+- AlmaLinux 8, 9, 10
+- Debian 12, 13
+- Fedora 42, 43, 44
 - Rocky Linux 8, 9, 10
-- Fedora 39+
+- Ubuntu 22.04, 24.04
 
-## Role Variables
+Role Variables
+---------------
+Defined in `defaults/main.yml`:
 
-### Basic Configuration
+- `swap_enabled` (bool): Desired runtime state; `true` runs `swapon -a`, `false` runs `swapoff -a` (default: `true`).
+- `swap_swappiness` (int|null): Kernel swappiness value (0-100) to set via `vm.swappiness`; set to `null` to skip managing it entirely (default: `60`).
 
-- `swap_enabled` (bool): Desired runtime state; `true` runs `swapon -a`, `false` runs `swapoff -a`. Default: `true`.
-- `swap_swappiness` (int|null): Set `vm.swappiness` when enabled; Default: `60`.
-
-## Dependencies
-
-- `community.general` (for `swapfile`)
-- `ansible.posix` (for `sysctl`)
-
-## Example Playbook
-
-### Enable swap (runtime)
+Example Playbook
+-----------------
+Enable swap and tune swappiness:
 
 ```yaml
 - hosts: all
   become: true
   roles:
-    - role: iamenros.ansible_role_swap
+    - role: iamenr0s.ansible_role_swap
       vars:
         swap_enabled: true
         swap_swappiness: 40
 ```
 
-### Disable swap (runtime)
+Disable swap:
 
 ```yaml
 - hosts: all
   become: true
   roles:
-    - role: iamenros.ansible_role_swap
+    - role: iamenr0s.ansible_role_swap
       vars:
         swap_enabled: false
 ```
 
-## Testing
+Contributing & Security
+-------------------------
+- Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+- Report vulnerabilities privately per [SECURITY.md](SECURITY.md); do not open public issues for them.
 
-Molecule scenario uses a privileged container but keeps `swap_enabled: false` by default because enabling swap is typically not allowed in containers. Adjust for real hosts as needed.
+CI & Release (maintainers)
+----------------------------
+A single workflow (`.github/workflows/molecule.yml`) runs lint and the full Molecule distro matrix on pushes to `main`, PRs, and `v*` tags. On `v*` tags, a `release` job publishes to Ansible Galaxy after all tests pass.
 
-## License
+The Galaxy API key lives in the `galaxy` GitHub environment, which only `v*` tags may target. One-time setup:
 
+```bash
+# Galaxy publishing key (environment-scoped, get it from galaxy.ansible.com/ui/token)
+gh secret set GALAXY_API_KEY --env galaxy --repo iamenr0s/ansible-role-swap
+
+# Code scanning notifications (Slack webhook URL; for Discord append /slack to the webhook URL)
+gh secret set SECURITY_ALERT_WEBHOOK --env galaxy --repo iamenr0s/ansible-role-swap
+```
+
+`.github/workflows/code-scanning-notify.yml` polls the code-scanning API every 6 hours and posts new or updated open alerts to that webhook (GitHub Actions cannot trigger on `code_scanning_alert` directly).
+
+To release: tag a commit `vX.Y.Z` and push the tag — CI gates the Galaxy publish.
+
+License
+-------
 This project is licensed under the [MIT License](LICENSE).
 
-## Author Information
-
+Author Information
+--------------------
 Author: iamenr0s
 Galaxy: `iamenr0s.ansible_role_swap`
-
-## Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## Changelog
-
-See `CHANGELOG.md` for version history and release notes.
-
