@@ -33,6 +33,19 @@
     - name: Gather facts
       ansible.builtin.setup:
 
+    - name: Detect swap entries before role execution
+      ansible.builtin.command:
+        cmd: awk 'NR>1{print}' /proc/swaps
+      register: __pre_role_swap
+      changed_when: false
+      failed_when: false
+
+    - name: Persist pre-role swap snapshot for verify
+      ansible.builtin.copy:
+        dest: /tmp/molecule_pre_role_swap.txt
+        content: "{{ __pre_role_swap.stdout }}"
+        mode: "0644"
+
   roles:
     - role: "{{ playbook_dir }}/../.."
       become: true
