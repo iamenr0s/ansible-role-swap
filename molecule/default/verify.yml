@@ -29,8 +29,16 @@
       changed_when: false
       failed_when: false
 
-    - name: Verify | Assert the role did not enable swap inside the container
+    - name: Verify | Read pre-role swap snapshot
+      ansible.builtin.slurp:
+        src: /tmp/molecule_pre_role_swap.txt
+      register: __pre_role_swap_file
+
+    - name: Verify | Assert the role did not change swap state inside the container
       ansible.builtin.assert:
         that:
-          - (__verify_swap_entries.stdout_lines | default([])) | length == 0
-        fail_msg: "Unexpected active swap entries found: {{ __verify_swap_entries.stdout_lines }}"
+          - __verify_swap_entries.stdout == (__pre_role_swap_file.content | b64decode)
+        fail_msg: >-
+          Swap state changed unexpectedly.
+          Before role: {{ (__pre_role_swap_file.content | b64decode) }}
+          After role: {{ __verify_swap_entries.stdout }}
