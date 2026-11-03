@@ -13,6 +13,10 @@
       "matchManagers": ["github-actions", "pre-commit"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "matchDepNames": ["python"],
+      "allowedVersions": "<3.15"
     }
   ]
 }
